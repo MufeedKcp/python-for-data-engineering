@@ -5,7 +5,7 @@ from typing import Dict, Optional, List
 class APIClient:
     """A robust API client with comprehensive error handling"""
 
-    def _init_(self, base_url: str, timeout: int = 30):
+    def __init__(self, base_url: str, timeout: int = 30):
         """Initialize the APIClient class"""
         self.base_url = base_url.rstrip('/')
         self.timeout = timeout
@@ -52,18 +52,3 @@ class APIClient:
             print(f"JSON Decode Error for {url}")
             print(f"Response content: {response.text}")
             raise
-
-client = APIClient('https://api.example.com')
-
-# GET requests
-params = {'limit': 10, 'offset': 0} 
-"""Query parameters for the API request"""
-
-headers = {'Authorization': 'Bearer <token>'}
-"""Additional headers for the API request"""
-
-data = client.get('Endpoint', params=params, headers=headers)
-"""Returns the response data as a dictionary or raises an exception"""
-
-print(f"Retreived {len(data)} items")
-# Example: {'items': [{'id': 1, 'name': 'Item 1'}, {'id': 2, 'name': 'Item 2'}]}
