@@ -52,7 +52,7 @@ class IncrementalCollector:
             'order': 'asc'        
         }
         data = self.api_client.get(endpoint, params=params)
-        print(f"Fetched {endpoint} with {len(data)} items")
+        print(f"Fetched {endpoint} since {since_dt} with {len(data)} items")
 
         self.state[endpoint] = {
             'last_run': datetime.now().isoformat(),
