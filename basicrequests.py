@@ -1,6 +1,6 @@
 import requests
 import json
-from typing import Dict, Optional, List
+from typing import Dict, Optional
 
 class APIClient:
     """A robust API client with comprehensive error handling"""
@@ -46,7 +46,7 @@ class APIClient:
             print(f"Connection error for {url}")
             raise
         except requests.exceptions.HTTPError as e:
-            print(f"HTTP Error {e.reponse.status_code}: {e.response.text}")
+            print(f"HTTP Error {e.reponse.status_code}")
             raise
         except requests.JSONDecodeError:
             print(f"JSON Decode Error for {url}")
