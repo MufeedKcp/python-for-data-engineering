@@ -2,6 +2,7 @@ from typing import Optional, Dict, List, Generator
 from datetime import timedelta, time, datetime
 from pathlib import Path
 from basicrequests import *
+import json
 
 class IncrementalCollector:
     """Collect only new or updated data since last run"""
