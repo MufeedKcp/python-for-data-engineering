@@ -41,7 +41,7 @@ class IncrementalCollector:
         last_run = self.state.get(endpoint, {}).get('last_run')
 
         if last_run:
-            last_run_dt = datetime.isoformat(last_run)
+            last_run_dt = datetime.fromisoformat(last_run)
             since_dt = last_run_dt - timedelta(hours=loolback_hour)
         else: 
             since_dt = datetime.now() - timedelta(days=7)
