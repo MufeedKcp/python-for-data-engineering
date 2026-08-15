@@ -78,11 +78,11 @@ class RobustAPIClient(APIClient):
         try:
             response = self.session.get(self.base_url(endpoint), timeout=self.timeout, **kwargs)
 
-            if response == 429:
+            if response.status_code == 429:
                 retry_after = response.headers.get('Retry-After', 60)
                 raise RateLimitError(f"Rate Limited, Retry After {retry_after}s..")
 
-            if response in [401, 403]:
+            if response.status_code in [401, 403]:
                 raise AuthenticationError(f"Authentication Error Occured {response.status_code}")
 
             response.raise_for_status()
