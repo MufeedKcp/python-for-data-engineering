@@ -68,3 +68,38 @@ def retry_with_backoff(max_retries: int = 3, backoff_factor: float = 2.0, max_de
         
         return wrapper
     return decorator
+
+
+class RobustAPIClient(APIClient):
+    """API Client with strong Error Handling"""
+    @retry_with_backoff(max_retries=5)
+    def fetch_data(self, endpoint: str, **kwargs) -> Dict:
+        """Get request with automatic retry logic"""
+        try:
+            response = self.session.get(self.base_url(endpoint), timeout=self.timeout, **kwargs)
+
+            if response == 429:
+                retry_after = response.headers.get('Retry-After', 60)
+                raise RateLimitError(f"Rate Limited, Retry After {retry_after}s..")
+
+            if response in [401, 403]:
+                raise AuthenticationError(f"Authentication Error Occured {response.status_code}")
+
+            response.raise_for_status()
+            return response.json()
+
+        except requests.RequestException as e:
+            print(f"Request Failed: {str(e)}")
+            raise
+
+api_client = RobustAPIClient('https.......')
+
+try:
+    data = api_client.fetch_data('/users', params={'limit': 100})
+    print(f"Successfully fetched {len(data)} items")
+except RateLimitError:
+    print("Rate Limited, Retry After Sometimes")
+except AuthenticationError:
+    print(f"Authentication Failed")
+except Exception as e:
+    print(f"Unexpected error Occured {str(e)}")
