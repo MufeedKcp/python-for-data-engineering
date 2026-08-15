@@ -76,7 +76,7 @@ class RobustAPIClient(APIClient):
     def fetch_data(self, endpoint: str, **kwargs) -> Dict:
         """Get request with automatic retry logic"""
         try:
-            response = self.session.get(self.base_url(endpoint), timeout=self.timeout, **kwargs)
+            response = self.session.get(self._build_url(endpoint), timeout=self.timeout, **kwargs)
 
             if response.status_code == 429:
                 retry_after = response.headers.get('Retry-After', 60)
