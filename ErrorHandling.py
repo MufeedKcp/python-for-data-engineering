@@ -1,6 +1,7 @@
 from typing import Callable, Any
 from functools import wraps
 import random
+import requests
 import time
 from basicrequests import *
 
@@ -63,7 +64,7 @@ def retry_with_backoff(max_retries: int = 3, backoff_factor: float = 2.0, max_de
                     print(f"Unexpected Error Occured: {str(e)}")
                     raise
 
-            return last_execption or APIError(f"Failed after {max_retries} retries")
+            raise last_execption or APIError(f"Failed after {max_retries} retries")
 
         
         return wrapper
