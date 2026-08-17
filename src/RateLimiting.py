@@ -17,7 +17,7 @@ class RateLimiting:
         self.updated_at = time.time()
         self.lock = Lock()
 
-    def acquire(self, tokens: int) -> float:
+    def acquire(self, tokens: int = 1) -> float:
         """Acquiring token, block if neccesary
         args:
         tokens: Number of token to acquire"""
@@ -32,7 +32,7 @@ class RateLimiting:
 
                 if tokens > self.tokens:
                     deficit = tokens - self.tokens
-                    wait_time = deficit * (self.rate / self.per)
+                    wait_time = deficit * (self.per / self.rate)
                     time.sleep(wait_time)
 
             self.tokens -= tokens
@@ -68,15 +68,15 @@ class SlidinWindowRateLimiter:
                 return True
             return False
 
-        def wait_if_needed(self) -> float:
-            """Wait if rate limit exceeds"""
-            total_wait_time = 0
-            while not self.is_allowed:
-                wait_time = 1.0
-                total_wait_time +=wait_time
-                time.sleep(wait_time)
-                
-            return total_wait_time
+    def wait_if_needed(self) -> float:
+        """Wait if rate limit exceeds"""
+        total_wait_time = 0
+        while not self.is_allowed():
+            wait_time = 1.0
+            total_wait_time +=wait_time
+            time.sleep(wait_time)
+            
+        return total_wait_time
 
         
 class ThrottledAPIClient(APIClient):
