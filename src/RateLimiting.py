@@ -1,6 +1,7 @@
+from datetime import timedelta, datetime
 import time
 from threading import Lock
-
+from collections import deque
 
 class RateLimiting:
     """Token Bucket Rate Limiter for API requests"""
@@ -37,4 +38,43 @@ class RateLimiting:
 
         return 0
 
-    
+class SlidinWindowRateLimiter:
+    """Sliding window rate limiter for more precise control"""
+    def __init__(self, max_requests: int, window_size: int):
+        """Initializing the rate limiter
+        args:
+        max_requests: Maximum requests allowed in a window
+        window_size: Window size in seconds
+        """
+        self.max_requests = max_requests
+        self.window_size = window_size
+        self.requests = deque()
+        self.lock = Lock()
+
+    def is_allowed(self) -> bool:
+        """Check if requests is allowed"""
+        with self.lock:
+            now = datetime.now()
+            window_start = now - timedelta(seconds=self.window_size)
+
+            # Remove old requests outside window
+            while self.requests and self.requests[0] < window_start:
+                self.requests.popleft()
+
+            # Checking if we can make requests
+            if len(self.requests) < self.max_requests:
+                self.requests.append(now)
+                return True
+            return False
+
+        def wait_if_needed(self) -> float:
+            """Wait if rate limit exceeds"""
+            total_wait_time = 0
+            while not self.is_allowed:
+                wait_time = 1.0
+                total_wait_time +=wait_time
+                time.sleep(wait_time)
+                
+            return total_wait_time
+        
+        
