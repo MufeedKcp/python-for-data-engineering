@@ -32,7 +32,7 @@ class RateLimiting:
 
                 if tokens > self.tokens:
                     deficit = tokens - self.tokens
-                    wait_time = deficit * (self.per / self.rate)
+                    wait_time = deficit * (self.rate / self.per)
                     time.sleep(wait_time)
 
             self.tokens -= tokens
