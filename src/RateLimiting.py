@@ -2,6 +2,7 @@ from datetime import timedelta, datetime
 import time
 from threading import Lock
 from collections import deque
+from basicrequests import *
 
 class RateLimiting:
     """Token Bucket Rate Limiter for API requests"""
@@ -76,5 +77,27 @@ class SlidinWindowRateLimiter:
                 time.sleep(wait_time)
                 
             return total_wait_time
+
         
-        
+class ThrottledAPIClient(APIClient):
+    """API Client with build-in Rate limiter"""
+
+    def __init__(self, base_url, timeout = 30, requests_per_sec: float = 10):
+        """Initializing the Throttled API-Client"""
+        super().__init__(base_url, timeout)
+        self.rate_limiter = RateLimiting(rate=int(requests_per_sec), per=2.0)
+
+    def get(self, endpoints: str, **kwargs) -> Dict:
+        """Rate-Limiter for GET request"""
+        self.rate_limiter.acquire()
+        return super().get(endpoints, **kwargs)
+
+
+throttled_client = ThrottledAPIClient('https://api.example.com', requests_per_sec=3)
+
+for i in range(20):
+    start = time.time()
+    response = throttled_client.get(f'/users/{i}')
+    elapsed = time.time() - start
+    print(f"Requests {i} completed in {elapsed:.2f}s")
+    
